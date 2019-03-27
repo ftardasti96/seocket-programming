@@ -6,8 +6,8 @@
 #include<string.h>
 int main()
 {
-  char *buf = "Message";
-  char *msg;
+  char *buf = "Message from client sent to server";
+  char msg[100];
   //creat client socket 
   int clientSockfd = socket(AF_INET,SOCK_DGRAM,0);
   //the server address we want to send 
@@ -19,8 +19,9 @@ int main()
   sendto(clientSockfd,(const char*)buf,strlen(buf),MSG_CONFIRM,(const struct sockaddr*)&ServerAddr,sizeof(ServerAddr));
 
   //what is received from server?
-  //  recv(clientSockfd,msg,sizeof(msg),0);
-  //printf("server sent %s \n",msg);
+  int n = recv(clientSockfd,(char*)msg,sizeof(msg),0);
+  msg[n] = '\0';
+  printf("server sent: %s \n",msg);
 
   //close socket
   close(clientSockfd);

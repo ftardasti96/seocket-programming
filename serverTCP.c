@@ -3,8 +3,23 @@
 #include<stdio.h>
 #include<string.h>
 
+char* parser(char* buf)
+{
+  char *req;
+  for(int i = 0 ; i < sizeof(buf); i++)
+    {
+      if(buf[i] == 47)
+	for(int j = 0; buf[i] != 32; j++)
+	  req[j] = buf[i];
+    }
+
+  return req;
+
+}
+
+
 int main() {
-  char sbuf[100];
+  char buf[1000];
   socklen_t len;
   //create a socket on the side of server
   int serverSockfd = socket(AF_INET,SOCK_STREAM,0);
@@ -30,12 +45,30 @@ int main() {
     printf("accept problem");
 
   //receive from client
-  recv(newfd,sbuf,sizeof(sbuf),0);
-  printf("client sent: %s \n",sbuf);
+  recv(newfd,buf,sizeof(buf),0);
+  printf("%s \n",buf);
 
+  //pars request that is sent in buf
+  int test1 = 0;
+  for(test1;;test1++)
+    if(buf[test1]==47)
+      break;
+
+  int test2 = test1;
+  for(test2;;test2++)
+    if(buf[test2]==32)
+      break;
+
+  char req[20]={0};
+  for(int k=test1;k<test2;k++)
+    req[k-test1] = buf[k];
+  //  printf("%d %d\n",test1,test2);
+  printf("%s\n",req);
+  
   //send to client
   char* msg = "Hello world!";
+  //if(req == "/helloworld.html")
   send(newfd,(const char*)msg,strlen(msg),0);
-  
+  //  send(newfd,hello.html,sizeof(hello.html),0);
   return 0;
 } 

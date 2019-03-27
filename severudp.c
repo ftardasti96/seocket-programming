@@ -24,6 +24,7 @@ int main() {
 
   //sendto client
   printf("now server wants to send msg to client\n");
+  smsg = "Hello world";
   sendto(serverSockfd,(const char*)smsg,strlen(smsg),0,(const struct sockaddr*)&clientAdr,sizeof(clientAdr));
   
   return 0;

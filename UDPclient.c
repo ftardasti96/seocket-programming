@@ -19,8 +19,9 @@ int main()
   sendto(clientSockfd,(const char*)buf,strlen(buf),MSG_CONFIRM,(const struct sockaddr*)&ServerAddr,sizeof(ServerAddr));
 
   //what is received from server?
-  int n = recv(clientSockfd,(char*)msg,sizeof(msg),0);
-  msg[n] = '\0';
+  int len;
+  int n = recvfrom(clientSockfd,(char*)msg,sizeof(msg),0,(struct sockaddr*)&ServerAddr,&len);
+  //  msg[n] = '\0';
   printf("server sent: %s \n",msg);
 
   //close socket

@@ -2,24 +2,10 @@
 #include<arpa/inet.h>
 #include<stdio.h>
 #include<string.h>
-
-char* parser(char* buf)
-{
-  char *req;
-  for(int i = 0 ; i < sizeof(buf); i++)
-    {
-      if(buf[i] == 47)
-	for(int j = 0; buf[i] != 32; j++)
-	  req[j] = buf[i];
-    }
-
-  return req;
-
-}
-
-
+#include<unistd.h>
 int main() {
   char buf[1000];
+  char *ermsg = "404 error page not found";
   socklen_t len;
   //create a socket on the side of server
   int serverSockfd = socket(AF_INET,SOCK_STREAM,0);
@@ -27,8 +13,10 @@ int main() {
   struct sockaddr_in ServerAddr;
   struct sockaddr_storage connectionSock;
   ServerAddr.sin_family = AF_INET;                                       
-  ServerAddr.sin_port = htons(8081);                                   
-  ServerAddr.sin_addr.s_addr = INADDR_ANY;
+  ServerAddr.sin_port = htons(8081);
+  struct in_addr addr;
+  inet_aton("127.1.2.3",&addr);
+  ServerAddr.sin_addr = addr;
 
   //bind server address to socket
   bind(serverSockfd,(const struct sockaddr*)&ServerAddr,sizeof(ServerAddr));
@@ -62,13 +50,18 @@ int main() {
   char req[20]={0};
   for(int k=test1;k<test2;k++)
     req[k-test1] = buf[k];
-  //  printf("%d %d\n",test1,test2);
   printf("%s\n",req);
   
-  //send to client
-  char* msg = "Hello world!";
-  //if(req == "/helloworld.html")
-  send(newfd,(const char*)msg,strlen(msg),0);
-  //  send(newfd,hello.html,sizeof(hello.html),0);
+  //send html file to client
+  char header[] = "HTTP/1.0 200 OK\r\n";
+  char html[]="<html><head> WEBSERVER  </head><body><pre>!!!!!Hello World!!!!!!</pre></body></html>";
+  
+  char data[2048]={0};
+  snprintf(data,sizeof(data),"%s %s",header,html);
+  if(memcmp(req,"/helloworld.html",17)==0)
+      send(newfd,data,strlen(data),0);
+  else
+    send(newfd,(const char*)ermsg,strlen(ermsg),0);
+
   return 0;
 } 
